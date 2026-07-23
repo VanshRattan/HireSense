@@ -55,7 +55,7 @@ HireSense is a multimodal AI platform that evaluates interview performance from 
 <img src="screenshots/analysis.png" width="850">
 </p>
 
-> *(Replace these images once the project is completed.)*
+
 
 ---
 
@@ -97,12 +97,5 @@ HireSense/
 
 ---
 
-## 👨‍💻 Author
-
-**Vansh Rattan**
-
-B.E. Computer Engineering (Data Science)
-
-Thapar Institute of Engineering and Technology
 
 ⭐ **Project currently under active development.**
