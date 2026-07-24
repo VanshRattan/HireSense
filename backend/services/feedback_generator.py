@@ -67,28 +67,68 @@ def generate_feedback(audio_analysis_result: dict, video_analysis_result: dict =
         summary = "### Mistakes Identified:\n- " + "\n- ".join(mistakes) + "\n\n"
         summary += "### What you should do to improve:\n- " + "\n- ".join(improvements) + "\n\n"
 
-    # Perfect Answer Rewrite (LLM Integration)
+    # Perfect Answer Rewrite (Dual-LLM Integration: Groq + Gemini)
     import os
     import urllib.request
     import json
+    
+    groq_key = os.environ.get("GROQ_API_KEY")
     gemini_key = os.environ.get("GEMINI_API_KEY")
-    if gemini_key and len(transcript.strip()) > 5:
+    
+    if groq_key and len(transcript.strip()) > 5:
         try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+            url = "https://api.groq.com/openai/v1/chat/completions"
+            payload = {
+                "model": "llama-3.1-8b-instant",
+                "messages": [{
+                    "role": "user",
+                    "content": f"Rewrite the following interview answer to sound highly professional, extremely confident, and concise, eliminating all filler words but keeping the original core meaning. Do not include any explanations or intro text, just output the revised answer:\n\n{transcript}"
+                }]
+            }
+            # Adding User-Agent to bypass Cloudflare 1010 blocking for raw urllib requests
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {groq_key}',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            }
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
+            res = urllib.request.urlopen(req, timeout=12)
+            res_json = json.loads(res.read())
+            perfect_answer = res_json['choices'][0]['message']['content']
+            summary += f"\n\n### Wait, how could I have said this better?\nHere is what you *should* have said instead:\n\n\"{perfect_answer.strip()}\""
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode()
+            print(f"Groq API HTTP Error [{e.code}]: {error_body}")
+            summary += f"\n\n*(Could not generate the perfect rewrite due to a Groq API Error: {error_body}).* \n\n"
+        except Exception as e:
+            print(f"Groq Route Failed: {e}")
+            summary += "\n\n*(Could not generate the perfect rewrite because the Groq API was unreachable).* \n\n"
+            
+    elif gemini_key and len(transcript.strip()) > 5:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_key}"
             payload = {
                 "contents": [{"parts": [{"text": f"Rewrite the following interview answer to sound highly professional, extremely confident, and concise, eliminating all filler words but keeping the original core meaning. Do not include any explanations or intro text, just output the revised answer:\n\n{transcript}"}]}]
             }
             req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
-            res = urllib.request.urlopen(req, timeout=8)
+            res = urllib.request.urlopen(req, timeout=12)
             res_json = json.loads(res.read())
             perfect_answer = res_json['candidates'][0]['content']['parts'][0]['text']
             
             summary += f"\n\n### Wait, how could I have said this better?\nHere is what you *should* have said instead:\n\n\"{perfect_answer.strip()}\""
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode()
+            print(f"Gemini API HTTP Error [{e.code}]: {error_body}")
+            if e.code == 429:
+                summary += "\n\n*(Could not generate the perfect rewrite due to a Google API Quota/Rate Limit on your account. Please wait 1 minute and try again).* \n\n"
+            else:
+                summary += f"\n\n*(Gemini API Error {e.code}: Please check your backend terminal for details).* \n\n"
         except Exception as e:
             print(f"Gemini LLM Rewrite Failed: {e}")
-            summary += "\n\n*(Could not generate the perfect rewrite because the Gemini API key was invalid or unreachable).* \n\n"
-    elif not gemini_key:
-        summary += "\n\n*(Tip: Add GEMINI_API_KEY to your .env file to let the AI rewrite your answers perfectly!)* \n\n"
+            summary += "\n\n*(Could not generate the perfect rewrite because the Gemini API was unreachable).* \n\n"
+            
+    elif not gemini_key and not groq_key:
+        summary += "\n\n*(Tip: Add a GROQ_API_KEY or GEMINI_API_KEY to your .env file to let the AI rewrite your answers perfectly!)* \n\n"
         
     return {
         "communication_score": round(communication_score, 1),

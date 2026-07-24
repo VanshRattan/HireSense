@@ -1,21 +1,37 @@
 import cv2
 import mediapipe as mp
+# Force explicit load of solutions if it's missing on Windows
+import mediapipe.python.solutions.face_mesh as mp_face_mesh_module
 import numpy as np
+import os
+import subprocess
 
 def analyze_video(video_path: str):
     """
     Analyzes a video for eye contact/engagement using MediaPipe Face Mesh.
     Returns basic metrics like percentage of frames with good eye contact.
     """
-    mp_face_mesh = mp.solutions.face_mesh
-    face_mesh = mp_face_mesh.FaceMesh(
+    # Use explicit module reference
+    face_mesh = mp_face_mesh_module.FaceMesh(
         max_num_faces=1,
         refine_landmarks=True,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5
     )
+    import subprocess
     
     cap = cv2.VideoCapture(video_path)
+    
+    # If OpenCV failed to natively read the WebM browser chunk, we forcefully convert it to standard MP4 using FFmpeg
+    if not cap.isOpened() or cap.get(cv2.CAP_PROP_FRAME_COUNT) < 5:
+        cap.release()
+        mp4_path = video_path + "_converted.mp4"
+        try:
+            subprocess.run(["ffmpeg", "-y", "-i", video_path, "-vcodec", "libx264", mp4_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            cap = cv2.VideoCapture(mp4_path)
+        except Exception as e:
+            print(f"Fallback UI Conversion failed: {e}")
+            
     if not cap.isOpened():
         return {"error": "Could not open video", "eye_contact_percentage": 0, "engagement_score": 0}
         

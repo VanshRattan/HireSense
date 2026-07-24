@@ -19,7 +19,9 @@ def analyze_audio(audio_path: str):
         return {"error": "Model not loaded", "transcript": "", "filler_stats": {}}
         
     try:
-        result = model.transcribe(audio_path)
+        # We pass a highly specific context prompt so the fast 'base' model knows the correct spelling of custom names/acronyms!
+        custom_dictionary = "Vansh, BTech, Thapar Institute of Engineering and Technology."
+        result = model.transcribe(audio_path, initial_prompt=custom_dictionary)
         transcript = result["text"]
         
         # Calculate speaking duration
