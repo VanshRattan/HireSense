@@ -2,9 +2,9 @@ import whisper
 import os
 import re
 
-# Load the model only once when module is loaded. Using 'small' for better speech recognition accuracy.
+# Load the model only once when module is loaded. Using 'base' for lightning fast CPU transcription.
 try:
-    model = whisper.load_model("small")
+    model = whisper.load_model("base")
 except Exception as e:
     print(f"Failed to load whisper model: {e}")
     model = None
@@ -21,9 +21,16 @@ def analyze_audio(audio_path: str):
     try:
         result = model.transcribe(audio_path)
         transcript = result["text"]
+        
+        # Calculate speaking duration
+        duration = 1.0
+        if "segments" in result and len(result["segments"]) > 0:
+            duration = result["segments"][-1]["end"]
+            
     except Exception as e:
         print(f"Whisper transcription failed: {e}")
         transcript = f"Transcription failed: {e}"
+        duration = 1.0
     
     # Simple filler word counting using regex (case-insensitive words)
     filler_stats = {}
@@ -46,5 +53,6 @@ def analyze_audio(audio_path: str):
     return {
         "transcript": transcript,
         "filler_words_used": filler_stats,
-        "filler_word_count": total_fillers
+        "filler_word_count": total_fillers,
+        "duration": duration
     }

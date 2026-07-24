@@ -85,6 +85,7 @@ def finish_session(session_id: int, db: Session = Depends(get_db)):
         filler_words_used=feedback["filler_words_used"],
         feedback_summary=feedback["feedback_summary"],
         transcript=feedback["transcript"],
+        wpm=feedback.get("wpm", 0.0)
     )
     db.add(report)
     db.commit()

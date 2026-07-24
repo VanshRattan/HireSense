@@ -24,6 +24,7 @@ class ReportOut(BaseModel):
     filler_words_used: Optional[Dict[str, int]]
     feedback_summary: Optional[str]
     transcript: Optional[str]
+    wpm: Optional[float]
 
     class Config:
         from_attributes = True

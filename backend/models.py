@@ -30,5 +30,6 @@ class Report(Base):
     filler_words_used = Column(JSON) # e.g., {"um": 5, "like": 2}
     feedback_summary = Column(Text)
     transcript = Column(Text)
+    wpm = Column(Float, default=0.0)
     
     session = relationship("Session", back_populates="report")

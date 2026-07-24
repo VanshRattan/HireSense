@@ -171,7 +171,7 @@ export default function InterviewSession() {
               <h3 className="text-2xl font-bold text-white">Analysis Complete</h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-gradient-to-br from-indigo-900/50 to-blue-900/50 p-6 rounded-xl border border-indigo-500/30">
                 <p className="text-indigo-200 text-sm mb-1">Communication Score</p>
                 <p className="text-4xl font-bold text-white">{sessionData.communication_score}%</p>
@@ -179,6 +179,10 @@ export default function InterviewSession() {
               <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 p-6 rounded-xl border border-purple-500/30">
                 <p className="text-purple-200 text-sm mb-1">Confidence Score</p>
                 <p className="text-4xl font-bold text-white">{sessionData.confidence_score}%</p>
+              </div>
+              <div className="bg-gradient-to-br from-cyan-900/50 to-teal-900/50 p-6 rounded-xl border border-cyan-500/30">
+                <p className="text-cyan-200 text-sm mb-1">Speaking Pace (WPM)</p>
+                <p className="text-4xl font-bold text-white">{sessionData.wpm || 0}</p>
               </div>
             </div>
 
