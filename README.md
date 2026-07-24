@@ -1,101 +1,48 @@
-<div align="center">
+# HireSense 🎤👁️
 
-# 🚀 HireSense
+HireSense is an AI-powered interview assessment platform that helps candidates practice mock interviews and receive real-time, actionable feedback based on their audio, speech patterns, and facial expressions.
 
-### AI-Powered Interview Assessment Platform
+## Architecture 🏛️
 
-Analyze interview performance using **Computer Vision**, **Speech Processing**, and **Natural Language Processing**.
+*   **Frontend**: Next.js 15 (React App Router) + Tailwind CSS + Framer Motion for a stunning, glassmorphic UI.
+*   **Backend**: FastAPI, connected to PostgreSQL via SQLAlchemy.
+*   **ML Pipeline**:
+    *   **Audio**: OpenAI Whisper for Speech-to-Text inference, plus basic NLP heuristics for filler-word counting.
+    *   **Video**: OpenCV + MediaPipe Face Mesh to extrapolate eye contact quality and facial emotion (e.g. smiling for engagement score).
+*   **Infrastructure**: Docker Compose for orchestrating the Frontend, Backend, and Database all in one command.
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
-![PyTorch](https://img.shields.io/badge/PyTorch-DeepLearning-red?style=for-the-badge&logo=pytorch)
-![OpenCV](https://img.shields.io/badge/OpenCV-ComputerVision-green?style=for-the-badge&logo=opencv)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi)
+## Local Dev Setup 🚀
 
-</div>
+To get up and running:
 
----
+1.  **Clone the repository**.
+2.  **Copy the env file**: `cp .env.example .env` (adjust `.env` if needed).
+3.  **Run Docker Compose**:
+    ```bash
+    docker-compose up --build
+    ```
+4.  **Access the app**:
+    *   Frontend: `http://localhost:3000`
+    *   Backend API Docs: `http://localhost:8000/docs`
 
-## 📌 Overview
+### Manual Run (Without Docker)
 
-HireSense is a multimodal AI platform that evaluates interview performance from recorded videos. It combines **Computer Vision**, **Speech Processing**, and **NLP** to analyze eye contact, facial expressions, communication skills, and speech patterns, providing AI-powered interview feedback.
+You can run each service manually.
 
----
-
-## ✨ Features
-
-✅ Eye Contact Detection
-
-✅ Facial Expression Analysis
-
-✅ Emotion Recognition
-
-✅ Speech-to-Text Transcription
-
-✅ Filler Word Detection
-
-✅ Grammar & Fluency Analysis
-
-✅ Communication & Confidence Scoring
-
-✅ AI Interview Feedback
-
----
-
-## 🖼️ Preview
-
-### Dashboard
-
-<p align="center">
-<img src="screenshots/dashboard.png" width="850">
-</p>
-
-### Interview Analysis
-
-<p align="center">
-<img src="screenshots/analysis.png" width="850">
-</p>
-
-
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Technologies |
-|----------|--------------|
-| Frontend | React, Tailwind CSS |
-| Backend | FastAPI, Python |
-| AI/ML | PyTorch, OpenCV, MediaPipe, Whisper, Transformers |
-| Database | MongoDB |
-| Deployment | Docker, Render |
-
----
-
-## 📂 Project Structure
-
-```
-HireSense/
-│
-├── backend/
-├── frontend/
-├── models/
-├── datasets/
-├── screenshots/
-├── README.md
-└── requirements.txt
+**Terminal 1 (Backend)**
+```bash
+cd backend
+python -m venv venv
+# Windows: venv\Scripts\activate | Mac/Linux: source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
----
+**Terminal 2 (Frontend)**
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## 🚧 Development Status
-
-- ✅ Repository Setup
-- 🚧 Backend Development
-- ⏳ AI Model Integration
-- ⏳ Dashboard Development
-- ⏳ Deployment
-
----
-
-
-⭐ **Project currently under active development.**
+Enjoy practicing your interviews!
