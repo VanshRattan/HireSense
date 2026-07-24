@@ -12,12 +12,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    build: 
+    build:
       context: ./backend
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://user:password@db:5432/hiresense
+      DATABASE_URL: ${DATABASE_URL:-postgresql://user:password@db:5432/hiresense}
     depends_on:
       - db
     volumes:

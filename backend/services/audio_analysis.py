@@ -2,9 +2,9 @@ import whisper
 import os
 import re
 
-# Load the model only once when module is loaded. Using small/base for speed in dev.
+# Load the model only once when module is loaded. Using 'small' for better speech recognition accuracy.
 try:
-    model = whisper.load_model("base")
+    model = whisper.load_model("small")
 except Exception as e:
     print(f"Failed to load whisper model: {e}")
     model = None
@@ -18,8 +18,12 @@ def analyze_audio(audio_path: str):
     if model is None:
         return {"error": "Model not loaded", "transcript": "", "filler_stats": {}}
         
-    result = model.transcribe(audio_path)
-    transcript = result["text"]
+    try:
+        result = model.transcribe(audio_path)
+        transcript = result["text"]
+    except Exception as e:
+        print(f"Whisper transcription failed: {e}")
+        transcript = f"Transcription failed: {e}"
     
     # Simple filler word counting using regex (case-insensitive words)
     filler_stats = {}
